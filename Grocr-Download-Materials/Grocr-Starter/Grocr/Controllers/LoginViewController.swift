@@ -10,11 +10,7 @@ import Firebase
 class LoginViewController: UIViewController {
 
     var author = Author(uid: "", email: "")
-    //var author: Author?
-    // MARK: Constants
-    let loginToList = "LoginToList"
     
-    // MARK: Outlets
     @IBOutlet weak var textFieldLoginEmail: UITextField!
     @IBOutlet weak var textFieldLoginPassword: UITextField!
     
@@ -104,17 +100,21 @@ class LoginViewController: UIViewController {
                             return
                     }
                     
-                    //                guard
-                    //                    let user = user
-                    //                    else { print("user is nil.")
-                    //                        return
-                    //                }
-                    //
-                    //                let userName = firstName + lastName
-                    //                let authorRef = Database.database().reference().child("author")
-                    //                let newAuthorRef = authorRef.child(userName)
-                    //                let author = Author(authData: user, userName: userName)
-                    //                newAuthorRef.setValue(author.userName)
+                    if let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest() {
+
+                        changeRequest.displayName = firstName + lastName
+
+                        changeRequest.commitChanges(completion: { (error) in
+
+                            if let error = error {
+
+                                print("Fail to change displayName:\(error.localizedDescription)")
+
+                            }
+
+                        })
+
+                    }
                     
                     Auth.auth().signIn(withEmail: loginEmail, password: loginPassword, completion: nil)
                     
@@ -156,9 +156,9 @@ class LoginViewController: UIViewController {
             
             if let user = user {
                 
-//                guard let author = self.author
+//                guard var author = self.author
 //                    else { print("author in LoginViewController is nil.")
-//                        return
+//                    return
 //                }
                 
                 self.author = Author(authData: user)

@@ -244,19 +244,19 @@ class ArticleListTableViewController: UITableViewController {
             formatter.dateFormat = "MM.dd.yyyy"
             let dateResult = formatter.string(from: date)
 
-            guard
-                let author = self.author
-                else { print("author is nil.")
-                return
-            }
-
 //            guard
-//                let email = author.email
-//                else { print("email is nil.")
+//                let author = self.author
+//                else { print("author is nil.")
 //                return
 //            }
 
-            let articleItem = Article(addByAuthor: author.email, key: "", title: title, content: content, date: dateResult, isLike: false)
+            guard
+                let currentUsername = Auth.auth().currentUser?.displayName
+                else { print("currentUser is nil.")
+                    return
+            }
+
+            let articleItem = Article(addByAuthor: currentUsername, key: "", title: title, content: content, date: dateResult, isLike: false)
             let articleItemRef = self.articlesRef.child(title.lowercased())
 
             //setValue method need a Dictionary type, call toAnyObject() to turn it into a Dictionary type.

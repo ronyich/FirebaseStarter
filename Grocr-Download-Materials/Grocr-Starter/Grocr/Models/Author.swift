@@ -13,7 +13,6 @@ struct Author {
 
     let uid: String
     let email: String
-    //var userName: String
     
     init(authData: Firebase.User) {
         uid = authData.uid
@@ -23,7 +22,6 @@ struct Author {
     init(uid: String, email: String) {
         self.uid = uid
         self.email = email
-        //self.userName = userName
     }
 
 }
