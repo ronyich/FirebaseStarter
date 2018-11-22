@@ -14,8 +14,7 @@ class OnlineUsersTableViewController: UITableViewController {
     
     // MARK: Properties
     var currentUsers: [String] = []
-
-    let usersRef = Database.database().reference(withPath: "online")
+    let authorsRef = Database.database().reference(withPath: "Online")
   
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -26,7 +25,7 @@ class OnlineUsersTableViewController: UITableViewController {
         super.viewDidLoad()
         //currentUsers.append("hungry@person.food")
 
-        usersRef.observe(.childAdded) { (snap) in
+        authorsRef.observe(.childAdded) { (snap) in
 
             guard
                 let email = snap.value as? String
@@ -41,7 +40,7 @@ class OnlineUsersTableViewController: UITableViewController {
 
         }
 
-        usersRef.observe(.childRemoved) { (snap) in
+        authorsRef.observe(.childRemoved) { (snap) in
 
             guard
                 let emailToFind = snap.value as? String
@@ -92,7 +91,7 @@ class OnlineUsersTableViewController: UITableViewController {
                 return
         }
         
-        let onlineRef = Database.database().reference(withPath: "online/\(user.uid)")
+        let onlineRef = Database.database().reference(withPath: "Online/\(user.uid)")
         
         onlineRef.removeValue { (error, _) in
             

@@ -16,11 +16,13 @@ struct GroceryItem {
   var completed: Bool
   
   init(name: String, addedByUser: String, completed: Bool, key: String = "") {
+
     self.ref = nil
     self.key = key
     self.name = name
     self.addedByUser = addedByUser
     self.completed = completed
+
   }
   
   init?(snapshot: DataSnapshot) {

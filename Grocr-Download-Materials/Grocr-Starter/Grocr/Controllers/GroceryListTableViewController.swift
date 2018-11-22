@@ -8,22 +8,22 @@ import UIKit
 import Firebase
 
 class GroceryListTableViewController: UITableViewController {
-    
+
     // MARK: Constants
     let listToUsers = "ListToUsers"
-    
+
     // MARK: Properties
     var items: [GroceryItem] = []
     var user: User!
     var userCountBarButtonItem: UIBarButtonItem!
-    
+
     let ref = Database.database().reference(withPath: "grocery-items")
     let usersRef = Database.database().reference(withPath: "online")
-    
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
+
     // MARK: UIViewController Lifecycle
     
     override func viewDidLoad() {
@@ -132,7 +132,7 @@ class GroceryListTableViewController: UITableViewController {
         groceryItem.ref?.updateChildValues([
             "completed": toggledCompletion
             ])
-
+        items[indexPath.row].ref?.updateChildValues(["compeleted" : !groceryItem.completed])
     }
     
     func toggleCellCheckbox(_ cell: UITableViewCell, isCompleted: Bool) {
