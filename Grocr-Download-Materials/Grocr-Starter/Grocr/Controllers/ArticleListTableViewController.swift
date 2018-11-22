@@ -18,37 +18,34 @@ class ArticleListTableViewCell: UITableViewCell {
     @IBOutlet weak var toggleLikeButton: UIButton!
 
 }
-      
+
 class ArticleListTableViewController: UITableViewController {
 
     let listToUsers = "ListToUsers"
-    
+
     var userCountBarButtonItem: UIBarButtonItem!
 
     var articles: [Article] = []
     var author: Author?
-    
+
     let articlesRef = Database.database().reference(withPath: "articles")
     let authorsRef = Database.database().reference(withPath: "Online")
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        print("0")
         tableView.allowsMultipleSelectionDuringEditing = false
-        
+
         userCountBarButtonItem = UIBarButtonItem(title: "1",
                                                  style: .plain,
                                                  target: self,
                                                  action: #selector(userCountButtonDidTouch))
+
         userCountBarButtonItem.tintColor = UIColor.white
         navigationItem.leftBarButtonItem = userCountBarButtonItem
 
-        //author = Author(uid: "FakeID", email: "Fake@firebase.com")
-
         articlesRef.queryOrdered(byChild: "isLike").observe(.value) { (snapshot) in
-            
+
             var newItems: [Article] = []
 
             for child in snapshot.children {
@@ -71,64 +68,42 @@ class ArticleListTableViewController: UITableViewController {
 
         }
 
-        Auth.auth().addStateDidChangeListener { (auth, user) in
+        Auth.auth().addStateDidChangeListener { (_, user) in
 
-            print("1")
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
             guard
                 let user = user
                 else { print("user is nil.")
                     return
             }
-            
-            print("2")
 
             guard
                 let author = self.author
                 else { print("author is nil.")
                     return
             }
-            print("3")
+
             self.author = Author(authData: user)
 
             let currentUserRef = self.authorsRef.child(author.uid)
             currentUserRef.setValue(author.email)
-            //currentUserRef.setValue(author.userName)
             currentUserRef.onDisconnectRemoveValue()
-            print("4")
+
         }
 
         authorsRef.observe(.value) { (snapshot) in
-            
+
             if snapshot.exists() {
-                
+
                 self.userCountBarButtonItem.title = snapshot.childrenCount.description
-                
+
             } else {
-                
+
                 self.userCountBarButtonItem.title = "0"
-                
+
             }
-            
+
         }
-        print("author:\(self.author)")
+
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -162,7 +137,8 @@ class ArticleListTableViewController: UITableViewController {
 
         guard
             let cell = tableView.dequeueReusableCell(withIdentifier: "ArticleListTableViewCell", for: indexPath) as? ArticleListTableViewCell
-            else { fatalError("ArticleListTableViewCell is nil.") }
+            else { fatalError("ArticleListTableViewCell is nil.")
+        }
 
         let articleItem = articles[indexPath.row]
 
@@ -182,7 +158,7 @@ class ArticleListTableViewController: UITableViewController {
         }
 
         cell.toggleLikeButton.addTarget(self, action: #selector(switchLikeStatus), for: .touchUpInside)
-        
+
         return cell
 
     }
@@ -192,13 +168,13 @@ class ArticleListTableViewController: UITableViewController {
         guard
             let cell = button.superview?.superview as? ArticleListTableViewCell
             else { print("switchLikeStatus cell as ArticleListTableViewCell error.")
-                return
+            return
         }
 
         guard
             let indexPath = tableView.indexPath(for: cell)
             else { print("indexPath is nil.")
-                return
+            return
         }
 
         let articleItem = articles[indexPath.row]
@@ -207,13 +183,13 @@ class ArticleListTableViewController: UITableViewController {
         if articleItem.isLike {
 
             cell.toggleLikeButton.setTitleColor(.lightGray, for: .normal)
-            
+
         } else {
 
             cell.toggleLikeButton.setTitleColor(.red, for: .normal)
 
         }
-        
+
         articleItem.ref?.updateChildValues(["isLike": toggledCompletion])
 
     }
@@ -230,7 +206,7 @@ class ArticleListTableViewController: UITableViewController {
                 let title = alert.textFields?[0].text
                 else { print("title input error.")
                 return
-                    
+
             }
 
             guard
@@ -244,26 +220,21 @@ class ArticleListTableViewController: UITableViewController {
             formatter.dateFormat = "MM.dd.yyyy"
             let dateResult = formatter.string(from: date)
 
-//            guard
-//                let author = self.author
-//                else { print("author is nil.")
-//                return
-//            }
-
             guard
                 let currentUsername = Auth.auth().currentUser?.displayName
                 else { print("currentUser is nil.")
-                    return
+                return
             }
 
             let articleItem = Article(addByAuthor: currentUsername, key: "", title: title, content: content, date: dateResult, isLike: false)
+
             let articleItemRef = self.articlesRef.child(title.lowercased())
 
-            //setValue method need a Dictionary type, call toAnyObject() to turn it into a Dictionary type.
             articleItemRef.setValue(articleItem.toAnyObject())
 
             self.articles.append(articleItem)
             self.tableView.reloadData()
+
         }
 
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
@@ -275,6 +246,7 @@ class ArticleListTableViewController: UITableViewController {
         alert.addTextField { (articleContent) in
             articleContent.placeholder = "Enter article content"
         }
+
         alert.addAction(saveAction)
         alert.addAction(cancelAction)
 
@@ -283,6 +255,9 @@ class ArticleListTableViewController: UITableViewController {
     }
 
     @objc func userCountButtonDidTouch() {
+
         performSegue(withIdentifier: listToUsers, sender: nil)
+
     }
+
 }

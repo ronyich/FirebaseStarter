@@ -32,7 +32,7 @@ struct Article {
         self.isLike = isLike
 
     }
-    
+
     init?(snapshot: DataSnapshot) {
 
         guard
@@ -42,7 +42,7 @@ struct Article {
             let content = value["content"] as? String,
             let date = value["date"] as? String,
             let isLike = value["isLike"] as? Bool else {
-                
+
             print("Artcle init? property error.")
             return nil
 
@@ -56,7 +56,7 @@ struct Article {
         self.content = content
         self.date = date
         self.isLike = isLike
-        
+
     }
 
     func toAnyObject() -> Any {
@@ -72,5 +72,5 @@ struct Article {
         ]
 
     }
-    
+
 }
