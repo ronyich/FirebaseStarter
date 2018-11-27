@@ -19,8 +19,9 @@ struct Article {
     var content: String
     var date: String
     var isLike: Bool
+    var uid: String
 
-    init(addByAuthor: String, key: String = "", title: String, content: String, date: String, isLike: Bool) {
+    init(addByAuthor: String, key: String = "", title: String, content: String, date: String, isLike: Bool, uid: String) {
 
         self.ref = nil
         self.key = key
@@ -30,6 +31,7 @@ struct Article {
         self.content = content
         self.date = date
         self.isLike = isLike
+        self.uid = uid
 
     }
 
@@ -41,7 +43,8 @@ struct Article {
             let title = value["title"] as? String,
             let content = value["content"] as? String,
             let date = value["date"] as? String,
-            let isLike = value["isLike"] as? Bool else {
+            let isLike = value["isLike"] as? Bool,
+            let uid = value["uid"] as? String else {
 
             print("Artcle init? property error.")
             return nil
@@ -56,6 +59,7 @@ struct Article {
         self.content = content
         self.date = date
         self.isLike = isLike
+        self.uid = uid
 
     }
 
@@ -67,7 +71,8 @@ struct Article {
             "title": title,
             "content": content,
             "date": date,
-            "isLike": isLike
+            "isLike": isLike,
+            "uid": uid
 
         ]
 

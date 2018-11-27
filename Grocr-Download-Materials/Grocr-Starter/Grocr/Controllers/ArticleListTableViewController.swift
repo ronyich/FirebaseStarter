@@ -44,7 +44,12 @@ class ArticleListTableViewController: UITableViewController {
         userCountBarButtonItem.tintColor = UIColor.white
         navigationItem.leftBarButtonItem = userCountBarButtonItem
 
-        articlesRef.queryOrdered(byChild: "isLike").observe(.value) { (snapshot) in
+        guard let uid = Auth.auth().currentUser?.uid
+            else { print("CurrentUser uid is nil.")
+                return
+        }
+
+        articlesRef.child(uid).queryOrdered(byChild: "addByAuthor").observe(.value) { (snapshot) in
 
             var newItems: [Article] = []
 
@@ -52,12 +57,11 @@ class ArticleListTableViewController: UITableViewController {
 
                 if let snapshot = child as? DataSnapshot,
                     let articleItem = Article(snapshot: snapshot) {
-
                     newItems.append(articleItem)
 
                 } else {
 
-                    print("child can't as DataSnapshot.")
+                    print("snapshot child can't as DataSnapshot.")
 
                 }
 
@@ -65,7 +69,7 @@ class ArticleListTableViewController: UITableViewController {
 
             self.articles = newItems
             self.tableView.reloadData()
-
+            print("newItems", newItems)
         }
 
         Auth.auth().addStateDidChangeListener { (_, user) in
@@ -85,6 +89,7 @@ class ArticleListTableViewController: UITableViewController {
             self.author = Author(authData: user)
 
             let currentUserRef = self.authorsRef.child(author.uid)
+
             currentUserRef.setValue(author.email)
             currentUserRef.onDisconnectRemoveValue()
 
@@ -103,6 +108,8 @@ class ArticleListTableViewController: UITableViewController {
             }
 
         }
+
+        fetchArtclesByCreatedUser()
 
     }
 
@@ -226,9 +233,15 @@ class ArticleListTableViewController: UITableViewController {
                 return
             }
 
-            let articleItem = Article(addByAuthor: currentUsername, key: "", title: title, content: content, date: dateResult, isLike: false)
+            guard let uid = Auth.auth().currentUser?.uid
+                else { print("CurrentUser uid is nil.")
+                    return
+            }
 
-            let articleItemRef = self.articlesRef.child(title.lowercased())
+            let articleItem = Article(addByAuthor: currentUsername, key: "", title: title, content: content, date: dateResult, isLike: false, uid: uid)
+
+            //let articleItemRef = self.articlesRef.child(title.lowercased())
+            let articleItemRef = self.articlesRef.child(uid).child(title)
 
             articleItemRef.setValue(articleItem.toAnyObject())
 
@@ -257,6 +270,23 @@ class ArticleListTableViewController: UITableViewController {
     @objc func userCountButtonDidTouch() {
 
         performSegue(withIdentifier: listToUsers, sender: nil)
+
+    }
+
+    func fetchArtclesByCreatedUser() {
+
+        guard let uid = Auth.auth().currentUser?.uid
+            else { print("CurrentUser uid is nil.")
+            return
+        }
+
+        self.articlesRef.child(uid).observeSingleEvent(of: .value) { (snapshot) in
+
+            let snapshotChild = snapshot.hasChild("content")
+            print("snapshotFetch", snapshot)
+            print("snapshotChild", snapshotChild)
+
+        }
 
     }
 
